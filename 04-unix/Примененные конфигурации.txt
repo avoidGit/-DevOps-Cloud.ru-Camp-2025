@@ -1,0 +1,15 @@
+apt-get update # Работает
+
+1 способ:
+echo "nameserver 127.0.0.1" > /etc/resolv.conf
+# Перенаправляет все DNS-запросы на localhost
+# Вывод apt-get update: Temporary failure resolving 'archive.ubuntu.com'
+
+2 способ:
+echo "127.0.0.1 archive.ubuntu.com security.ubuntu.com" >> /etc/hosts
+# Перехватывает запросы к доменам Ubuntu, перенаправляя их на localhost.
+# Вывод apt-get update: Could not connect to archive.ubuntu.com:80 (127.0.0.1). - connect (111: Connection refused)
+
+# Полная блокировка невозможна в рамках условий задачи:
+# Контейнер запущен без привилегий (--privileged), поэтому команды вроде {ip route del default} или {ip link set eth0 down} возвращают ошибку "Operation not permitted".
+# Изменение DNS или hosts-файла влияет только на разрешение доменов, но не блокирует весь трафик (например, запросы по IP-адресам или не перехваченные домены остаются доступными).

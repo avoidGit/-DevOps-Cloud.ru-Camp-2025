@@ -1,0 +1,37 @@
+# Global settings
+namespace: my-app
+
+# Deployment settings
+image:
+  repository: avoidocker/01-application
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 3
+
+env:
+  AUTHOR: "k8s"
+
+probes:
+  livenessProbe:
+    path: /healthz
+    port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readinessProbe:
+    path: /readyz
+    port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: my-web-app.local
+  path: /
+  pathType: Prefix

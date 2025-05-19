@@ -1,0 +1,39 @@
+---
+- name: Configure Nginx as a load balancer with Least Connections method
+  hosts: cloud
+  become: yes  # Запуск команд с правами root
+  vars:
+    container_ports:
+      - 8081
+      - 8082
+      - 8083
+    nginx_config_path: /etc/nginx/conf.d/load_balancer.conf
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Remove default Nginx configuration
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Create Nginx configuration for load balancing
+      template:
+        src: templates/nginx_load_balancer.conf.j2
+        dest: "{{ nginx_config_path }}"
+      notify: Restart Nginx
+
+    - name: Ensure Nginx is running and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted

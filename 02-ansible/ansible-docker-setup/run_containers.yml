@@ -1,0 +1,34 @@
+---
+- name: Run Docker containers from a private Docker Hub repository
+  hosts: cloud
+  become: yes  # Запуск команд с правами root
+  vars_files:
+    - secrets.yml  # Подключаем зашифрованный файл с секретами
+  vars:
+    docker_image: "avoidocker/01-application:latest"  # Образ с DockerHub
+    container_name_prefix: "web-app"  # Префикс для имен контейнеров
+    container_count: 3  # Количество экземпляров контейнеров
+    container_base_port: 8081  # Начальный порт на хостовой машине
+    container_internal_port: 8000  # Порт внутри контейнера
+
+  tasks:
+    - name: Log in to Docker Hub
+      community.docker.docker_login:
+        username: "{{ docker_hub_username }}"
+        password: "{{ docker_hub_password }}"
+
+    - name: Pull the Docker image from the private repository
+      community.docker.docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+
+    - name: Ensure the containers are running
+      community.docker.docker_container:
+        name: "{{ container_name_prefix }}{{ item }}"
+        image: "{{ docker_image }}"
+        state: started
+        detach: yes
+        restart_policy: always
+        published_ports:
+          - "{{ container_base_port + item - 1 }}:{{ container_internal_port }}"
+      loop: "{{ range(1, container_count + 1) | list }}"  # Создаем контейнеры с номерами 1, 2, 3

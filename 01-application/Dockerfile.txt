@@ -1,0 +1,23 @@
+# Базовый образ с Python 3.9
+FROM python:3.9-slim
+
+# Установка рабочей директории внутри контейнера
+WORKDIR /app
+
+# Копирование файла requirements.txt (в моем случае только flask)
+COPY requirements.txt .
+
+# Установка зависимостей
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копирование исходного кода приложения
+COPY app.py .
+
+# Установка переменной окружения AUTHOR (можно изменить или передать извне)
+ENV AUTHOR="Не указан"
+
+# Открытие порта 8000 для Flask-приложения
+EXPOSE 8000
+
+# Команда для запуска приложения
+CMD ["python", "app.py"]
