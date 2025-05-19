@@ -2,8 +2,3 @@ docker login -u <username>
 docker images
 docker tag <image id> <username>/<name>:<tag>
 docker push <username>/<name>:<tag>
---- в моем случае:
-docker login -u avoidocker
-docker images
-docker tag 6959c592dbfa avoidocker/01-application (будет иметь тег latest)
-docker push avoidocker/01-application
